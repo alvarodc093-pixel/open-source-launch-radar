@@ -16,6 +16,8 @@ Lo completan un **asistente con RAG** que responde preguntas sobre los datos y e
 modelo citando sus fuentes, y un **panel de Power BI** con los indicadores de la
 muestra, el ruido de las descargas y la calidad del modelo.
 
+![Radar con un lanzamiento real del conjunto de test](docs/capturas/radar.png)
+
 **Resultados clave**, sobre 5.217 proyectos open source publicados por primera vez en
 PyPI entre noviembre de 2025 y octubre de 2026:
 
@@ -238,8 +240,27 @@ comparten estrellas):
   guardan normalizados y cuantizados a int8, sin base de datos vectorial. Entre los
   seis fragmentos que recibe el modelo entran como mucho dos fichas, para que no
   desplacen a la documentación.
-- **Generación:** un modelo servido con Ollama recibe esos fragmentos con la instrucción
-  de responder solo con ellos y citar cada dato con su número.
+- **Generación:** un modelo servido con Ollama (`qwen3.5` en local) recibe esos
+  fragmentos con la instrucción de responder solo con ellos y citar cada dato con su
+  número.
+- **Evaluación** (`npm run evaluar-asistente`, detalle en
+  [`docs/evaluacion_asistente.md`](docs/evaluacion_asistente.md)): 43 preguntas de
+  referencia, cada una con las secciones que contienen la respuesta. 24 son de
+  **ajuste** y 16 de **reserva**, escritas aparte para comprobar que lo decidido
+  generaliza; en los dos grupos hay preguntas directas y **reformuladas** sin las
+  palabras de la documentación («¿cuánto tráfico de bots recibe una librería solo por
+  publicar una versión nueva?»). Otras 3 son ajenas al proyecto.
+
+| Respuestas con el dato esperado | Ajuste: directas | Ajuste: reformuladas | Reserva: directas | Reserva: reformuladas |
+| ------------------------------- | ---------------- | -------------------- | ----------------- | --------------------- |
+| Híbrida (local)                 | 18/19            | 4/5                  | 8/10              | 3/6                   |
+| Solo palabras                   | 18/19            | 2/5                  | 7/10              | 4/6                   |
+
+En los dos modos todas las respuestas citan su fuente, las 3 preguntas ajenas se
+rechazan y cada respuesta tarda menos de 2 segundos. Los grupos son pequeños y el
+modelo varía entre ejecuciones, así que diferencias de una pregunta no son
+significativas; la comprobación busca la cifra o el término esperado, y el informe
+guarda cada respuesta para revisarlas a mano.
 
 ## 5. La aplicación
 
@@ -263,6 +284,34 @@ API del servidor:
 Las entradas se validan en el formulario y otra vez en el servidor, con mensajes que
 nombran el campo erróneo (400): por ejemplo, las descargas totales no pueden ser menos
 que las de usuario. Si faltan los datos exportados, las páginas y la API lo dicen (503).
+
+### Panel de inteligencia (Power BI)
+
+[`powerbi/OpenSourceLaunchRadar.pbip`](powerbi/) es un proyecto de Power BI en formato
+de texto (modelo semántico en TMDL e informe en PBIR), generado desde Python con
+`python -m radar.powerbi --proyecto`. Cada mes, `python -m radar.powerbi` solo renueva
+sus CSV. Cada página responde a una pregunta:
+
+| Página                     | Pregunta                                         | Contenido                                                                       |
+| -------------------------- | ------------------------------------------------ | ------------------------------------------------------------------------------- |
+| **Mercado**                | ¿Cómo es un lanzamiento típico en PyPI?          | Lanzamientos, mediana de descargas y de estrellas, por mes, categoría y estado  |
+| **Ruido de las descargas** | ¿Cuánto del contador es uso real?                | % de usuario, descargas totales y la curva del mes de usuario frente a totales |
+| **Calidad del modelo**     | ¿Cuánto acierta el radar en paquetes que no vio? | Factor de error, cobertura del rango, estimación frente a realidad, candidatos  |
+| **Detalle por paquete**    | ¿Qué estimó para cada paquete del test?          | Tabla con la lectura, el rango y el valor real                                  |
+
+El modelo es una estrella: `paquetes`, `calendario` y `lecturas` como dimensiones, y
+`curva_diaria`, `predicciones` y `metricas` como hechos. Las consultas leen los CSV de
+`powerbi/datos/` desde GitHub, así que el panel se actualiza con «Actualizar»; el
+parámetro `OrigenDatos` admite también una carpeta local. Un test comprueba que el
+factor de error y la cobertura del panel coinciden con los de la app. Para abrirlo hace
+falta [Power BI Desktop](https://aka.ms/pbidesktopstore) (gratuito, Windows): abrir el
+`.pbip` y pulsar **Inicio → Actualizar**.
+
+| Mercado                                               | Metodología                                   | Radar antes de la primera lectura                                    |
+| ----------------------------------------------------- | --------------------------------------------- | -------------------------------------------------------------------- |
+| ![Mercado](docs/capturas/mercado.png)                 | ![Metodología](docs/capturas/metodologia.png) | ![Portada del radar](docs/capturas/portada.png)                      |
+| **Antes de lanzar**                                   | **Asistente**                                 | **Móvil**                                                            |
+| ![Antes de lanzar](docs/capturas/antes-de-lanzar.png) | ![Asistente](docs/capturas/asistente.png)     | <img src="docs/capturas/movil.png" alt="Radar en un móvil" width="180"> |
 
 ## 6. Arquitectura y stack
 
@@ -350,6 +399,8 @@ python -m radar.ingesta           # ClickPy y GitHub (hora y media, reanudable)
 python -m radar.preparacion       # data/processed/
 python -m radar.exportar          # app/data/*.json y casos dorados de la app
 python -m radar.rag               # app/data/rag.json (índice del asistente; necesita Ollama)
+python -m radar.powerbi           # powerbi/datos/*.csv (--proyecto: también el .pbip)
+python -m radar.informe           # resumen de métricas en Markdown
 ```
 
 La ingesta de GitHub necesita un token: si `GITHUB_TOKEN` está vacío, usa el de la
@@ -361,19 +412,35 @@ sesión de la CLI `gh`. Ver `.env.example`.
 ollama pull embeddinggemma        # embeddings de las preguntas
 ollama pull qwen3.5               # modelo que redacta las respuestas
 cd app && npm run dev             # http://localhost:3000/asistente
+npm run evaluar-asistente         # vuelve a medir la calidad (unos minutos)
 ```
 
 Sin Ollama la app funciona igual y el asistente explica que no puede responder,
 enseñando las fuentes que encontró.
+
+### Despliegue en Vercel
+
+En Vercel, «Add New Project», importar el repositorio y fijar **Root Directory =
+`app`**. El radar no necesita variables de entorno. El asistente sí, porque Vercel no
+llega al Ollama de un equipo local: `OLLAMA_HOST=https://ollama.com`, `OLLAMA_API_KEY`
+con una clave de [ollama.com/settings/keys](https://ollama.com/settings/keys) y
+`OLLAMA_MODELO` con un modelo de la nube (por ejemplo `gpt-oss:120b`).
+
+### Actualización mensual de los datos
+
+El workflow necesita permiso para abrir Pull Requests: en GitHub, _Settings → Actions →
+General → Workflow permissions_, marcar «Read and write permissions» y «Allow GitHub
+Actions to create and approve pull requests».
 
 ### Comprobaciones
 
 | Dónde  | Comando                                                     | Qué cubre                                                                                 |
 | ------ | ----------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
 | Raíz   | `ruff check . && ruff format --check .`                     | Estilo y errores en `src/`, `tests/` y notebooks                                          |
-| Raíz   | `pytest --cov`                                              | Ingesta, preparación, modelo, exportación, EDA, contraste y asistente (cobertura > 90 %) |
+| Raíz   | `pytest --cov`                                              | 108 tests de ingesta, preparación, modelo, exportación, EDA, contraste, asistente y panel (cobertura del 98 %) |
 | `app/` | `npm run lint && npm run format:check && npm run typecheck` | ESLint, Prettier y tipos                                                                  |
-| `app/` | `npm test`                                                  | Inferencia en TypeScript frente a los casos calculados en Python, y el asistente          |
+| `app/` | `npm test`                                                  | Inferencia en TypeScript frente a 4.176 casos calculados en Python, y recuperación y validación del asistente |
+| `app/` | `npm run evaluar-asistente`                                 | Calidad del asistente con Ollama (recuperación y respuestas) |
 | `app/` | `npm run build && npm run humo`                             | Arranca el build de producción y prueba páginas y API                                     |
 
 ## 8. Estructura del repositorio
@@ -395,15 +462,25 @@ open-source-launch-radar/
 │   ├── contraste.py              descargas de usuario frente a estrellas
 │   ├── modelo.py                 partición temporal, candidatos e intervalo conformal
 │   ├── exportar.py               modelos y tablas para la app
-│   └── rag.py                    índice del asistente (fragmentos y embeddings)
+│   ├── rag.py                    índice del asistente (fragmentos y embeddings)
+│   ├── powerbi.py                tablas en estrella y proyecto de Power BI
+│   └── informe.py                resumen de métricas
 ├── tests/                        pytest
+├── powerbi/
+│   ├── datos/                    CSV del modelo en estrella
+│   ├── OpenSourceLaunchRadar.pbip             se abre con Power BI Desktop
+│   ├── OpenSourceLaunchRadar.SemanticModel/   tablas, relaciones y medidas DAX (TMDL)
+│   └── OpenSourceLaunchRadar.Report/          páginas y visuales (PBIR)
 ├── app/
 │   ├── data/                     modelos, tablas e índice del asistente
 │   ├── src/app/                  páginas y rutas de la API
 │   ├── src/components/           formularios y gráficos
 │   ├── src/lib/                  inferencia, validación y lectura de datos
-│   ├── tests/                    casos dorados y tests de Node
-│   └── scripts/                  prueba de humo
+│   ├── tests/                    casos dorados, preguntas de referencia y tests de Node
+│   └── scripts/                  prueba de humo y evaluación del asistente
+├── docs/
+│   ├── capturas/
+│   └── evaluacion_asistente.md   resultado de la última evaluación del asistente
 ├── requirements.txt              versiones exactas; instala también el paquete radar
 ├── pyproject.toml                ruff, pytest y cobertura
 └── LICENSE
