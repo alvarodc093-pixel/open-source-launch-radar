@@ -6,6 +6,7 @@ import json
 from datetime import date, timedelta
 from pathlib import Path
 
+import pandas as pd
 import pytest
 
 from radar import preparacion as prep
@@ -188,3 +189,51 @@ def test_main_escribe_las_tablas(
     assert embudo["con_enlace_a_github"] == 2
     # paquetes.csv solo guarda los candidatos, no los que no tienen repositorio.
     assert "otro" not in (procesado / "paquetes.csv").read_text(encoding="utf-8")
+
+
+@pytest.mark.parametrize(
+    ("paquete", "repo", "esperado"),
+    [
+        ("mseep-pptagent", "icip-cas/pptagent", "mseep"),
+        ("iflow-mcp-smadi0x86-gdb-mcp", "smadi0x86/gdb-mcp", "iflow-mcp"),
+        ("iflow-mcp-2niuhe-mcp-plantuml", "2niuhe/mcp_plantuml", "iflow-mcp"),
+        ("django-ninja", "vitalik/django-ninja", None),  # el prefijo es del nombre
+        ("nlr-elm", "natlabrockies/elm", "nlr"),  # patrón, pero de un solo dueño
+        ("pandas", "pandas-dev/pandas", None),
+    ],
+)
+def test_prefijo_ajeno(paquete: str, repo: str, esperado: str | None) -> None:
+    assert prep.prefijo_ajeno(paquete, repo) == esperado
+
+
+def test_republicadores_exigen_muchos_duenos() -> None:
+    filas = [
+        {"paquete": f"copia-proyecto{i}", "repo": f"dueno{i}/proyecto{i}"}
+        for i in range(10)
+    ]
+    filas += [{"paquete": f"nlr-p{i}", "repo": f"natlab/p{i}"} for i in range(10)]
+    assert prep.republicadores(pd.DataFrame(filas)) == {"copia"}
+
+
+def test_construir_tablas_excluye_republicados() -> None:
+    lanzamientos = [
+        _lanzamiento(f"copia-p{i}", urls=[f"https://github.com/d{i}/p{i}"])
+        for i in range(10)
+    ] + [_lanzamiento("propio")]
+    repos = {f"d{i}/p{i}": _repo(f"p{i}", repo=f"d{i}/p{i}") for i in range(10)}
+    repos["dueno/propio"] = _repo("propio")
+    series = {p["paquete"]: _serie() for p in lanzamientos}
+    paquetes, _ = prep.construir_tablas(lanzamientos, repos, series)
+    estados = dict(zip(paquetes["paquete"], paquetes["estado"], strict=True))
+    assert estados["propio"] == "apto"
+    assert {estados[f"copia-p{i}"] for i in range(10)} == {"republicado"}
+
+
+def test_es_republicado_con_el_prefijo_ya_identificado() -> None:
+    ajenos = {"mseep"}
+    assert prep.es_republicado(
+        "mseep-claude-agent-sdk", "anthropics/claude-agent-sdk-python", ajenos
+    )
+    assert not prep.es_republicado("mseep-tools", "mseep/tools", ajenos)  # suyo
+    assert not prep.es_republicado("otro", "a/otro", ajenos)
+    assert not prep.es_republicado("mseep-x", float("nan"), ajenos)

@@ -40,6 +40,11 @@ PCT_PREVIAS_MAX = 0.05
 # Un repositorio con más de un año antes de su primera subida a PyPI es un
 # proyecto que ya tenía usuarios (o un paquete renombrado), no un lanzamiento.
 DIAS_REPO_PREVIOS_MAX = 365
+# Un prefijo que se pone delante del nombre de repositorios de al menos 10
+# dueños distintos es de alguien que republica proyectos ajenos en PyPI (en
+# 2026, «iflow-mcp-…» y «mseep-…» con cientos de servidores MCP). Esos paquetes
+# enlazan el repositorio original y se quedarían con sus estrellas.
+REPUBLICADOS_MIN_DUENOS = 10
 
 # Categorías, en orden de prioridad: un paquete de agentes que también es una
 # herramienta de línea de comandos cuenta como «Agentes y LLM». Cada una se
@@ -203,6 +208,61 @@ def fila_paquete(
     return fila, diaria
 
 
+def _normalizar(texto: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "-", texto.lower()).strip("-")
+
+
+def prefijo_ajeno(paquete: str, repo: str) -> str | None:
+    """El prefijo si el paquete es «prefijo-» + el repositorio de otro.
+
+    `mseep-pptagent` para icip-cas/pptagent da «mseep»; `django-ninja` para
+    vitalik/django-ninja no da nada, porque el prefijo es parte del nombre.
+    """
+    dueno, nombre = (_normalizar(x) for x in repo.split("/", 1))
+    completo = f"{dueno}-{nombre}"
+    partes = paquete.split("-")
+    for i in range(1, min(3, len(partes))):
+        prefijo, resto = "-".join(partes[:i]), "-".join(partes[i:])
+        if prefijo in completo:
+            continue
+        sin_guiones = resto.replace("-", "")
+        if resto in (nombre, completo) or sin_guiones in (
+            nombre.replace("-", ""),
+            completo.replace("-", ""),
+        ):
+            return prefijo
+    return None
+
+
+def republicadores(paquetes: pd.DataFrame) -> set[str]:
+    """Prefijos que se usan con repositorios de muchos dueños distintos."""
+    con_repo = paquetes.dropna(subset=["repo"])
+    prefijos = pd.Series(
+        [
+            prefijo_ajeno(p, r)
+            for p, r in zip(con_repo["paquete"], con_repo["repo"], strict=True)
+        ],
+        index=con_repo.index,
+    )
+    duenos = con_repo["repo"].str.split("/").str[0].groupby(prefijos).nunique()
+    return set(duenos[duenos >= REPUBLICADOS_MIN_DUENOS].index)
+
+
+def es_republicado(paquete: str, repo: Any, ajenos: set[str]) -> bool:
+    """Lleva el prefijo de un republicador y el repositorio no es suyo.
+
+    Una vez identificado el prefijo, cuenta cualquier paquete que lo use,
+    aunque el resto del nombre no coincida exactamente con el repositorio
+    (`mseep-claude-agent-sdk` para anthropics/claude-agent-sdk-python).
+    """
+    if not isinstance(repo, str):
+        return False
+    dueno = _normalizar(repo.split("/", 1)[0])
+    return any(
+        paquete.startswith(f"{prefijo}-") and prefijo not in dueno for prefijo in ajenos
+    )
+
+
 def estado(fila: dict[str, Any]) -> str:
     """«apto» o el primer motivo por el que el paquete no entra en el modelo."""
     if fila.get("estrellas") is None:
@@ -245,6 +305,14 @@ def construir_tablas(
         if diaria is not None:
             diarias.append(diaria)
     paquetes = pd.DataFrame(filas).sort_values("paquete", ignore_index=True)
+    # Se decide con todos los paquetes a la vista, no uno a uno.
+    ajenos = republicadores(paquetes)
+    candidatos = ~paquetes["estado"].isin(["sin_repo", "pocas_estrellas"])
+    republicado = [
+        es_republicado(p, r, ajenos)
+        for p, r in zip(paquetes["paquete"], paquetes["repo"], strict=True)
+    ]
+    paquetes.loc[candidatos & pd.Series(republicado), "estado"] = "republicado"
     # Varios paquetes del mismo repositorio (monorepos, plugins) comparten las
     # estrellas: sirven para el radar, pero no para contrastar estrellas.
     aptos = paquetes["estado"] == "apto"
@@ -294,6 +362,7 @@ def embudo(paquetes: pd.DataFrame) -> dict[str, int]:
     for motivo in (
         "sin_repo",
         "pocas_estrellas",
+        "republicado",
         "repo_fork",
         "sin_descargas",
         "mes_incompleto",
@@ -318,6 +387,10 @@ def main() -> int:
     )
     paquetes = paquetes[~paquetes["estado"].isin(["sin_repo", "pocas_estrellas"])]
     paquetes.to_csv(config.DIR_PROCESADO / "paquetes.csv", index=False)
+    # La serie diaria solo de los aptos: es la que usan el EDA, las curvas y
+    # la app, y así el CSV del repositorio pesa la mitad.
+    aptos = set(paquetes.loc[paquetes["estado"] == "apto", "paquete"])
+    diaria = diaria[diaria["paquete"].isin(aptos)]
     diaria.to_csv(config.DIR_PROCESADO / "descargas_diarias.csv", index=False)
     radar = dataset_radar(paquetes)
     radar.to_csv(config.DIR_PROCESADO / "dataset_radar.csv", index=False)

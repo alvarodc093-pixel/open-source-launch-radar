@@ -56,6 +56,10 @@ _EXCLUIDO = "excluido, no entra en la muestra analizada ni en el entrenamiento p
 ESTADOS = {
     "apto": "apto, entra en la muestra analizada",
     "repo_fork": _EXCLUIDO + "su repositorio es un fork de otro",
+    "republicado": (
+        _EXCLUIDO + "es una copia de un proyecto ajeno publicada por otra persona "
+        "(enlaza el repositorio original)"
+    ),
     "sin_descargas": _EXCLUIDO + "no tiene ninguna descarga registrada",
     "mes_incompleto": _EXCLUIDO + "aún no ha cumplido su primer mes",
     "versiones_previas_borradas": (
