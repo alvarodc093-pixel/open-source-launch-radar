@@ -1,0 +1,330 @@
+{
+ "generado_en": "2026-11-23T15:07:21+00:00",
+ "embudo": {
+  "con_enlace_a_github": 79193,
+  "tras_sin_repo": 61817,
+  "tras_pocas_estrellas": 10610,
+  "tras_republicado": 9898,
+  "tras_repo_fork": 9823,
+  "tras_sin_descargas": 9823,
+  "tras_mes_incompleto": 9823,
+  "tras_versiones_previas_borradas": 9358,
+  "tras_proyecto_anterior": 4960
+ },
+ "paquetes_candidatos": 10610,
+ "paquetes_aptos": 4960,
+ "exclusiones": {
+  "apto": 4960,
+  "proyecto_anterior": 4398,
+  "republicado": 712,
+  "versiones_previas_borradas": 465,
+  "repo_fork": 75
+ },
+ "rango_lanzamientos": {
+  "desde": "2025-11-23",
+  "hasta": "2026-10-09"
+ },
+ "mediana_usuario_30d": 94.0,
+ "mediana_total_30d": 1648.5,
+ "mediana_pct_usuario_30d": 0.050634,
+ "fraccion_mediana_del_mes": {
+  "7": 0.5,
+  "14": 0.709302,
+  "21": 0.861538
+ },
+ "por_mes": [
+  {
+   "mes": "2025-11",
+   "lanzamientos": 125,
+   "mediana_30d": 60.0
+  },
+  {
+   "mes": "2025-12",
+   "lanzamientos": 474,
+   "mediana_30d": 56.5
+  },
+  {
+   "mes": "2026-01",
+   "lanzamientos": 499,
+   "mediana_30d": 57.0
+  },
+  {
+   "mes": "2026-02",
+   "lanzamientos": 563,
+   "mediana_30d": 82.0
+  },
+  {
+   "mes": "2026-03",
+   "lanzamientos": 765,
+   "mediana_30d": 86.0
+  },
+  {
+   "mes": "2026-04",
+   "lanzamientos": 585,
+   "mediana_30d": 107.0
+  },
+  {
+   "mes": "2026-05",
+   "lanzamientos": 486,
+   "mediana_30d": 157.5
+  },
+  {
+   "mes": "2026-06",
+   "lanzamientos": 451,
+   "mediana_30d": 142.0
+  },
+  {
+   "mes": "2026-07",
+   "lanzamientos": 394,
+   "mediana_30d": 127.0
+  },
+  {
+   "mes": "2026-08",
+   "lanzamientos": 280,
+   "mediana_30d": 113.0
+  },
+  {
+   "mes": "2026-09",
+   "lanzamientos": 243,
+   "mediana_30d": 97.0
+  },
+  {
+   "mes": "2026-10",
+   "lanzamientos": 95,
+   "mediana_30d": 90.0
+  }
+ ],
+ "por_categoria": [
+  {
+   "categoria": "Agentes y LLM",
+   "n": 2542,
+   "mediana_30d": 96.0
+  },
+  {
+   "categoria": "Datos y ciencia",
+   "n": 618,
+   "mediana_30d": 95.0
+  },
+  {
+   "categoria": "Herramientas de desarrollo",
+   "n": 457,
+   "mediana_30d": 113.0
+  },
+  {
+   "categoria": "Machine learning",
+   "n": 583,
+   "mediana_30d": 79.0
+  },
+  {
+   "categoria": "Otras",
+   "n": 371,
+   "mediana_30d": 83.0
+  },
+  {
+   "categoria": "Sistema y automatización",
+   "n": 82,
+   "mediana_30d": 87.0
+  },
+  {
+   "categoria": "Web y APIs",
+   "n": 307,
+   "mediana_30d": 96.0
+  }
+ ],
+ "por_propietario": [
+  {
+   "propietario_tipo": "Organización",
+   "n": 2269,
+   "mediana_30d": 100.0
+  },
+  {
+   "propietario_tipo": "Persona",
+   "n": 2691,
+   "mediana_30d": 89.0
+  }
+ ],
+ "curva_tipica": [
+  0.1513,
+  0.2745,
+  0.3413,
+  0.3846,
+  0.42,
+  0.4545,
+  0.5,
+  0.5353,
+  0.5682,
+  0.5957,
+  0.625,
+  0.6508,
+  0.6786,
+  0.7093,
+  0.7333,
+  0.7571,
+  0.7778,
+  0.8,
+  0.8192,
+  0.84,
+  0.8615,
+  0.8836,
+  0.9033,
+  0.9231,
+  0.9394,
+  0.9573,
+  0.9749,
+  0.9928,
+  1.0,
+  1.0
+ ],
+ "curva_tipica_total": [
+  0.2377,
+  0.3395,
+  0.3984,
+  0.449,
+  0.4945,
+  0.5376,
+  0.5788,
+  0.6197,
+  0.6533,
+  0.6836,
+  0.7104,
+  0.7323,
+  0.7545,
+  0.7771,
+  0.7992,
+  0.8174,
+  0.8338,
+  0.8498,
+  0.8665,
+  0.8806,
+  0.8936,
+  0.9072,
+  0.9204,
+  0.9328,
+  0.9446,
+  0.9562,
+  0.9679,
+  0.979,
+  0.99,
+  1.0
+ ],
+ "hallazgos": {
+  "spearman_7_30": 0.82,
+  "spearman_total_subidas": 0.83,
+  "spearman_usuario_subidas": 0.64,
+  "descargas_por_subida": 518.0,
+  "epsilon2": {
+   "categoria": 0.005,
+   "propietario": 0.003
+  }
+ },
+ "contraste_estrellas": {
+  "repos": 3613,
+  "spearman": 0.19,
+  "descargas_por_estrella": {
+   "mediana": 3.21,
+   "q25": 1.21,
+   "q75": 9.05
+  },
+  "por_categoria": [
+   {
+    "categoria": "Agentes y LLM",
+    "repos": 1650,
+    "spearman": 0.17
+   },
+   {
+    "categoria": "Datos y ciencia",
+    "repos": 511,
+    "spearman": 0.2
+   },
+   {
+    "categoria": "Herramientas de desarrollo",
+    "repos": 390,
+    "spearman": 0.2
+   },
+   {
+    "categoria": "Machine learning",
+    "repos": 472,
+    "spearman": 0.25
+   },
+   {
+    "categoria": "Otras",
+    "repos": 261,
+    "spearman": 0.19
+   },
+   {
+    "categoria": "Sistema y automatización",
+    "repos": 73,
+    "spearman": 0.12
+   },
+   {
+    "categoria": "Web y APIs",
+    "repos": 256,
+    "spearman": 0.16
+   }
+  ],
+  "mas_estrellas_que_uso": [
+   {
+    "paquete": "strix-sandbox",
+    "repo": "usestrix/strix",
+    "estrellas": 77208,
+    "usuario_30d": 3
+   },
+   {
+    "paquete": "openviking",
+    "repo": "volcengine/openviking",
+    "estrellas": 42656,
+    "usuario_30d": 17
+   },
+   {
+    "paquete": "clovyr-workspace-mcp",
+    "repo": "taylorwilsdon/google_workspace_mcp",
+    "estrellas": 3569,
+    "usuario_30d": 13
+   },
+   {
+    "paquete": "athena-agent",
+    "repo": "winstonkoh87/athena-public",
+    "estrellas": 650,
+    "usuario_30d": 9
+   },
+   {
+    "paquete": "openworker",
+    "repo": "andrewyng/openworker",
+    "estrellas": 19552,
+    "usuario_30d": 26
+   }
+  ],
+  "mas_uso_que_estrellas": [
+   {
+    "paquete": "uncalled-for",
+    "repo": "chrisguidry/uncalled-for",
+    "estrellas": 17,
+    "usuario_30d": 48753650
+   },
+   {
+    "paquete": "ultralytics-platform",
+    "repo": "ultralytics/sdk",
+    "estrellas": 20,
+    "usuario_30d": 1876226
+   },
+   {
+    "paquete": "cross-web",
+    "repo": "usecross/cross-web",
+    "estrellas": 10,
+    "usuario_30d": 1006208
+   },
+   {
+    "paquete": "typesafe-sdk",
+    "repo": "typesafe-ai/typesafe-sdk-python",
+    "estrellas": 316,
+    "usuario_30d": 2435606
+   },
+   {
+    "paquete": "wecom-aibot-python-sdk",
+    "repo": "wecomteam/wecom-aibot-python-sdk",
+    "estrellas": 56,
+    "usuario_30d": 156743
+   }
+  ]
+ }
+}
