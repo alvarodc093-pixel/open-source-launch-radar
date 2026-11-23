@@ -21,8 +21,8 @@ interface Turno {
 
 const SUGERENCIAS = [
   "¿Qué parte de las descargas de un paquete nuevo viene de usuarios reales?",
-  "¿Por qué a día 7 el radar usa una regla simple y no gradient boosting?",
-  "¿Cuántas reseñas tuvo Pax Autocratica en su primer mes?",
+  "¿Qué correlación hay entre las estrellas de GitHub y las descargas de usuario?",
+  "¿Cuántas descargas de usuario tuvo uncalled-for en su primer mes?",
   "¿Qué paquetes se excluyeron de la muestra y por qué?",
 ];
 

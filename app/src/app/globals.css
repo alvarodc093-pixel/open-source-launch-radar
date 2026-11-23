@@ -212,7 +212,7 @@ h3 {
 }
 
 /* Campos de texto y desplegables al ancho de su columna: el desplegable de
-   juegos tiene nombres muy largos y, sin esto, desborda en el móvil. */
+   paquetes tiene nombres muy largos y, sin esto, desborda en el móvil. */
 input:not([type="radio"]),
 select {
   width: 100%;

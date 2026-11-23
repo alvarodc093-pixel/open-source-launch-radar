@@ -14,13 +14,14 @@ import { Buscador, esFuenteEsperada, fusionar, tokenizar, type IndiceRag } from 
 const leer = async <T>(ruta: string): Promise<T> => JSON.parse(await readFile(ruta, "utf-8"));
 
 test("tokenizar quita tildes, mayúsculas y palabras vacías", () => {
-  assert.deepEqual(tokenizar("¿Cuántas reseñas tuvo el juego?"), [
+  assert.deepEqual(tokenizar("¿Cuántas descargas tuvo el paquete?"), [
     "cuantas",
-    "resenas",
+    "descargas",
     "tuvo",
-    "juego",
+    "paquete",
   ]);
-  assert.deepEqual(tokenizar("appid 2102040"), ["appid", "2102040"]);
+  // «for» es una palabra vacía en inglés: de «uncalled-for» solo queda «uncalled».
+  assert.deepEqual(tokenizar("uncalled-for 48753650"), ["uncalled", "48753650"]);
 });
 
 test("la fusión premia lo que aparece arriba en los dos rankings", () => {
@@ -50,19 +51,22 @@ test("validación de la conversación", () => {
 test("una repregunta corta se busca junto con la pregunta anterior", () => {
   const mensajes = [
     { rol: "usuario" as const, texto: "¿Cuál es el error del radar a día 7?" },
-    { rol: "asistente" as const, texto: "×1,21" },
+    { rol: "asistente" as const, texto: "×1,80" },
     { rol: "usuario" as const, texto: "¿Y a día 14?" },
   ];
   assert.match(consultaDeBusqueda(mensajes), /error del radar.*día 14/);
-  // Una pregunta completa sobre otro juego se busca sola.
+  // Una pregunta completa sobre otro paquete se busca sola.
   const otra = [
-    { rol: "usuario" as const, texto: "¿Cuántas reseñas tuvo Pax Autocratica en su primer mes?" },
-    { rol: "asistente" as const, texto: "1759 reseñas [1]." },
-    { rol: "usuario" as const, texto: "¿Cuántas copias ha vendido My Little Puppy?" },
+    { rol: "usuario" as const, texto: "¿Cuántas descargas tuvo uncalled-for en su primer mes?" },
+    { rol: "asistente" as const, texto: "48.753.650 descargas de usuario [1]." },
+    { rol: "usuario" as const, texto: "¿Cuántas estrellas tiene el repositorio de strix-sandbox?" },
   ];
-  assert.equal(consultaDeBusqueda(otra), "¿Cuántas copias ha vendido My Little Puppy?");
-  assert.equal(esRepregunta("¿Y el precio?"), true);
-  assert.equal(esRepregunta("y si fuera gratis, ¿cambiaría mucho la estimación?"), true);
+  assert.equal(
+    consultaDeBusqueda(otra),
+    "¿Cuántas estrellas tiene el repositorio de strix-sandbox?",
+  );
+  assert.equal(esRepregunta("¿Y las estrellas?"), true);
+  assert.equal(esRepregunta("y si lo publicara una empresa, ¿cambiaría la estimación?"), true);
   const prompt = construirPrompt(mensajes, []);
   assert.equal(prompt[0].role, "system");
   assert.equal(prompt.at(-1)!.role, "user");
