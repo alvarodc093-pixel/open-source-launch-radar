@@ -264,6 +264,7 @@ def dataset_radar(paquetes: pd.DataFrame) -> pd.DataFrame:
     columnas = [
         "paquete",
         "nombre",
+        "repo",
         "fecha_lanzamiento",
         "categoria",
         "propietario_tipo",
