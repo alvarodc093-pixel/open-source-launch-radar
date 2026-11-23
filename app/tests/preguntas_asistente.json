@@ -1,0 +1,246 @@
+[
+  {
+    "pregunta": "¿Qué parte de las reseñas del primer mes ha llegado el día 7?",
+    "fuentes": ["Notebook 02_eda · P1", "README · 3. Preprocesamiento y EDA"],
+    "contiene": ["62"]
+  },
+  {
+    "pregunta": "¿Qué modelo usa el radar a día 7?",
+    "fuentes": ["README · 4. Ciencia de datos", "Notebook 03_modelo · 1", "Notebook 03_modelo · 2"],
+    "contiene": ["ratio típico", "regla"]
+  },
+  {
+    "pregunta": "¿Cuál es el factor de error típico del radar a día 14?",
+    "fuentes": ["README · 4. Ciencia de datos", "Notebook 03_modelo · 2"],
+    "contiene": ["1,09", "1.09"]
+  },
+  {
+    "pregunta": "¿Cuántos juegos son aptos para el modelo?",
+    "fuentes": ["README · 2. Datos", "Notebook 01_preproceso · 5", "Notebook 01_preproceso · 7"],
+    "contiene": ["3.019", "3019", "3 019"]
+  },
+  {
+    "pregunta": "¿Por qué todas las cifras son de reseñas en inglés?",
+    "fuentes": ["README · 2. Datos", "README · 9. Decisiones"],
+    "contiene": ["sin clave", "API"]
+  },
+  {
+    "pregunta": "¿Cuántos juegos se excluyeron por haber salido de acceso anticipado?",
+    "fuentes": ["README · 3. Preprocesamiento y EDA", "Notebook 01_preproceso · 5"],
+    "contiene": ["357"]
+  },
+  {
+    "pregunta": "¿Cómo se calcula el intervalo del 90 %?",
+    "fuentes": ["README · 4. Ciencia de datos", "README · 9. Decisiones", "Notebook 03_modelo"],
+    "contiene": ["conformal", "calibración"]
+  },
+  {
+    "pregunta": "¿Cómo se reparten los juegos entre entrenamiento, calibración y test?",
+    "fuentes": ["README · 4. Ciencia de datos", "Notebook 03_modelo · 1"],
+    "contiene": ["1.811", "1811"]
+  },
+  {
+    "pregunta": "¿Influye el porcentaje de reseñas positivas de la primera semana en cómo acaba el mes?",
+    "fuentes": ["Notebook 02_eda · P5", "README · 3. Preprocesamiento y EDA"],
+    "contiene": ["21", "60 %"]
+  },
+  {
+    "pregunta": "¿Por qué la página Antes de lanzar no da una cifra concreta?",
+    "fuentes": [
+      "README · 4. Ciencia de datos",
+      "README · 9. Decisiones",
+      "Notebook 03_modelo · 5",
+      "Notebook 02_eda · P4"
+    ],
+    "contiene": ["rango", "mediana"]
+  },
+  {
+    "pregunta": "¿Cada cuánto se actualizan los datos de la aplicación?",
+    "fuentes": ["README · 6. Arquitectura y stack", "README · Actualización mensual"],
+    "contiene": ["mes", "mensual"]
+  },
+  {
+    "pregunta": "¿Qué significa un factor de error típico de ×1,21?",
+    "fuentes": ["README · 4. Ciencia de datos"],
+    "contiene": ["17", "21 %"]
+  },
+  {
+    "pregunta": "¿Cuántas reseñas tuvo My Little Puppy a los 30 días?",
+    "fuentes": ["juego-2102040"],
+    "contiene": ["500"]
+  },
+  {
+    "pregunta": "¿Quién desarrolló Super Woden: Rally Edge?",
+    "fuentes": ["juego-3218630"],
+    "contiene": ["ViJuDa"]
+  },
+  {
+    "pregunta": "¿Cuánto cuesta 5omeday?",
+    "fuentes": ["juego-3030980"],
+    "contiene": ["5,99", "5.99"]
+  },
+  {
+    "pregunta": "¿Por qué Kebab Chefs! no se usó para entrenar el modelo?",
+    "fuentes": ["juego-1001270"],
+    "contiene": ["acceso anticipado", "antes de la fecha", "anteriores a la fecha"]
+  },
+  {
+    "pregunta": "¿Cuántas reseñas tenía Warhounds el día 7?",
+    "fuentes": ["juego-3929470"],
+    "contiene": ["297"]
+  },
+  {
+    "pregunta": "¿Cuándo salió DaemonBride:ADDITIONAL GAIN?",
+    "fuentes": ["juego-3390980"],
+    "contiene": ["2025-12-30", "30 de diciembre", "30/12/2025"]
+  },
+  {
+    "pregunta": "¿Por qué Play Things quedó fuera de la muestra?",
+    "fuentes": ["juego-4635840"],
+    "contiene": ["ninguna reseña", "sin reseñas"]
+  },
+  {
+    "pregunta": "¿Cuánto se equivoca la herramienta una semana después del estreno?",
+    "reformulada": true,
+    "fuentes": ["README · 4. Ciencia de datos", "Notebook 03_modelo · 2"],
+    "contiene": ["1,21", "21 %", "17 %"]
+  },
+  {
+    "pregunta": "¿Qué pasa con un juego que recibe muchas críticas malas al principio?",
+    "reformulada": true,
+    "fuentes": ["Notebook 02_eda · P5", "README · 3. Preprocesamiento y EDA"],
+    "contiene": ["21", "60 %"]
+  },
+  {
+    "pregunta": "¿Se guarda lo que escriben los jugadores en sus opiniones?",
+    "reformulada": true,
+    "fuentes": ["README · 2. Datos"],
+    "contiene": ["fecha y el voto", "fecha y voto", "descart"]
+  },
+  {
+    "pregunta": "¿Por qué se dejan fuera los títulos que estuvieron en early access?",
+    "reformulada": true,
+    "fuentes": ["README · 3. Preprocesamiento y EDA", "Notebook 01_preproceso · 5"],
+    "contiene": ["5 %", "antes de la fecha", "anteriores a la fecha"]
+  },
+  {
+    "pregunta": "¿De dónde salen los datos con los que trabaja la aplicación?",
+    "reformulada": true,
+    "fuentes": ["README · 2. Datos"],
+    "contiene": ["Steam"]
+  },
+  {
+    "pregunta": "¿Cuántas reseñas tuvo REPLACED en su primer mes?",
+    "reserva": true,
+    "fuentes": ["juego-1663850"],
+    "contiene": ["1867", "1.867", "1 867"]
+  },
+  {
+    "pregunta": "¿Quién desarrolló Exo Rally Championship?",
+    "reserva": true,
+    "fuentes": ["juego-2262020"],
+    "contiene": ["Exbleative"]
+  },
+  {
+    "pregunta": "¿Cuánto cuesta Orbitmine?",
+    "reserva": true,
+    "fuentes": ["juego-4489770"],
+    "contiene": ["2,99", "2.99"]
+  },
+  {
+    "pregunta": "¿Cuántas reseñas tenía Military Incremental Complex a los 7 días?",
+    "reserva": true,
+    "fuentes": ["juego-3469750"],
+    "contiene": ["282"]
+  },
+  {
+    "pregunta": "¿Cuántas reseñas tiene el juego mediano al cumplir su primer mes?",
+    "reserva": true,
+    "fuentes": ["README · 3. Preprocesamiento y EDA", "Notebook 01_preproceso · 6"],
+    "contiene": ["48"]
+  },
+  {
+    "pregunta": "¿Qué día de la semana se lanzan más juegos?",
+    "reserva": true,
+    "fuentes": ["Notebook 02_eda · P6"],
+    "contiene": ["jueves"]
+  },
+  {
+    "pregunta": "¿Cuál es el multiplicador típico entre el día 7 y el día 30?",
+    "reserva": true,
+    "fuentes": ["Notebook 02_eda · P2"],
+    "contiene": ["1,6"]
+  },
+  {
+    "pregunta": "¿Qué modelo usa el radar a día 3?",
+    "reserva": true,
+    "fuentes": ["README · 4. Ciencia de datos", "Notebook 03_modelo · 1"],
+    "contiene": ["Ridge"]
+  },
+  {
+    "pregunta": "¿Cuántos juegos se excluyeron por no tener reseñas en inglés en su primer mes?",
+    "reserva": true,
+    "fuentes": ["README · 3. Preprocesamiento y EDA", "Notebook 01_preproceso · 5"],
+    "contiene": ["689"]
+  },
+  {
+    "pregunta": "¿Con qué frecuencia acierta el veredicto «por debajo» a día 7?",
+    "reserva": true,
+    "fuentes": ["README · ¿Acierta el veredicto?"],
+    "contiene": ["95"]
+  },
+  {
+    "pregunta": "¿Gano algo esperando a la segunda semana para mirar los números?",
+    "reserva": true,
+    "reformulada": true,
+    "fuentes": ["README · 4. Ciencia de datos", "Notebook 03_modelo · 2"],
+    "contiene": ["1,09", "9 %"]
+  },
+  {
+    "pregunta": "¿Los juegos gratis se comportan distinto en su primer mes?",
+    "reserva": true,
+    "reformulada": true,
+    "fuentes": ["Notebook 02_eda · P3"],
+    "contiene": ["1,18", "1,2", "gratuit"]
+  },
+  {
+    "pregunta": "¿Es verdad que los juegos que salen ahora consiguen más opiniones que los de hace un año?",
+    "reserva": true,
+    "reformulada": true,
+    "fuentes": ["README · 3. Preprocesamiento y EDA", "Notebook 02_eda · P7"],
+    "contiene": ["selección", "sesgo"]
+  },
+  {
+    "pregunta": "¿En qué casos se equivoca más la herramienta?",
+    "reserva": true,
+    "reformulada": true,
+    "fuentes": ["Notebook 03_modelo · 3", "README · 4. Ciencia de datos"],
+    "contiene": ["11 %", "menos de 10"]
+  },
+  {
+    "pregunta": "¿Hasta qué punto me puedo fiar del margen que da la herramienta?",
+    "reserva": true,
+    "reformulada": true,
+    "fuentes": ["README · 4. Ciencia de datos", "Notebook 03_modelo · 2"],
+    "contiene": ["92"]
+  },
+  {
+    "pregunta": "¿Puedo saber cuántas copias he vendido con esta herramienta?",
+    "reserva": true,
+    "reformulada": true,
+    "fuentes": ["README · 2. Datos", "README · Contraste con ventas anunciadas"],
+    "contiene": ["no publica", "estimaciones"]
+  },
+  {
+    "pregunta": "¿Cuál es la capital de Australia?",
+    "fuera_de_alcance": true
+  },
+  {
+    "pregunta": "¿Cuántas copias ha vendido My Little Puppy?",
+    "fuera_de_alcance": true
+  },
+  {
+    "pregunta": "¿Qué nota tiene Elden Ring en Metacritic?",
+    "fuera_de_alcance": true
+  }
+]
