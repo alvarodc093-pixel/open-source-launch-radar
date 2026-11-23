@@ -3,7 +3,7 @@
 // 1. Recuperación: con cada pregunta de tests/preguntas_asistente.json mira si
 //    alguna de sus fuentes esperadas sale primero (acierto@1) o entre los seis
 //    fragmentos que se pasan al modelo (acierto@6), con tres búsquedas: por
-//    palabras (la de la versión publicada, donde no hay embeddings), por
+//    palabras (la que usa la app en Vercel, donde no hay embeddings), por
 //    embeddings e híbrida (la de la app en local).
 // 2. Respuestas: si contienen el dato esperado, si citan fuentes y si
 //    reconocen que no saben cuando la pregunta queda fuera del proyecto.
@@ -148,14 +148,8 @@ busca el asistente; las de **reserva** se escribieron después y no interviniero
 decisiones, así que miden si generalizan. Las **reformuladas** evitan las palabras de la
 documentación. ${fuera.length} preguntas son ajenas al proyecto.
 
-La versión local usa la búsqueda híbrida; la publicada en Vercel no tiene embeddings
-(Ollama Cloud no los ofrece) y busca solo por palabras.
-
-Se probó también ampliar esa búsqueda con palabras clave que escribe el modelo de
-lenguaje antes de buscar (fusionando la búsqueda de la pregunta y la de las claves).
-No mejoró el resultado neto: ayudaba algo con las preguntas reformuladas y empeoraba
-algo las directas, dentro de la variación entre ejecuciones. Se descartó porque añade
-una llamada al modelo por pregunta sin una mejora medible.
+La versión local usa la búsqueda híbrida. Desplegada en Vercel con Ollama Cloud, que no
+ofrece embeddings, la app busca solo por palabras: por eso se miden los dos modos.
 
 ## Recuperación: la fuente esperada está entre los ${K} fragmentos
 
@@ -173,7 +167,7 @@ La comprobación es automática: busca la cifra o el término esperado en la
 respuesta, así que una respuesta correcta redactada de otra forma puede contar
 como fallo. Por eso se guardan las respuestas:
 
-| Híbrida | Palabras | Pregunta | Respuesta (solo palabras, la de la versión publicada) |
+| Híbrida | Palabras | Pregunta | Respuesta (solo palabras, como en Vercel) |
 | --- | --- | --- | --- |
 ${preguntas.map((p) => `| ${marca(hibrida.ok.get(p))} | ${marca(lexica.ok.get(p))} | ${p.reserva ? "(reserva) " : ""}${p.pregunta} | ${celda(lexica.textos.get(p))} |`).join("\n")}
 `;

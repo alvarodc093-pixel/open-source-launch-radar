@@ -24,8 +24,8 @@ export default function PaginaAsistente() {
             conclusiones de los notebooks y una ficha por paquete. Siempre se busca por palabras
             (BM25); si hay un modelo de embeddings disponible, como al ejecutar la app en local con
             Ollama, esa búsqueda se combina con otra por significado (<code>embeddinggemma</code>).
-            En esta versión publicada, Ollama Cloud no ofrece embeddings y la búsqueda es solo por
-            palabras. Cada respuesta indica cuál se usó.
+            Desplegada con Ollama Cloud, que no ofrece embeddings, la búsqueda es solo por palabras.
+            Cada respuesta indica cuál se usó.
           </p>
         </div>
         <div className="panel">
@@ -41,8 +41,8 @@ export default function PaginaAsistente() {
           <p className="nota">
             Con 43 preguntas de referencia, 16 de ellas de reserva: escritas después de ajustar la
             búsqueda, para comprobar que funciona con preguntas nuevas. En esas, de 10 preguntas
-            directas responde bien 10 en local y 8 en esta versión publicada; las formuladas con
-            otras palabras son su punto débil (3 de 6 y 1 de 6). Las preguntas ajenas al proyecto se
+            directas responde bien 8 con la búsqueda híbrida y 7 solo con palabras; las formuladas
+            con otras palabras son su punto débil (3 y 4 de 6). Las preguntas ajenas al proyecto se
             rechazan siempre. El detalle está en <code>docs/evaluacion_asistente.md</code>.
           </p>
         </div>
