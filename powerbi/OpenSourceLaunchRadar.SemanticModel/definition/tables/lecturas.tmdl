@@ -1,0 +1,31 @@
+table lecturas
+	lineageTag: 3439d1dd-42e5-5ad9-8d70-2b02df6e9912
+
+	column dia_lectura
+		dataType: int64
+		formatString: 0
+		isHidden
+		lineageTag: 91e001d0-d9f1-5bea-a3f2-d9b007751622
+		summarizeBy: none
+		sourceColumn: dia_lectura
+
+	column lectura
+		dataType: string
+		lineageTag: b1b8c466-42e4-5ed1-b48d-41f375c3f2d4
+		summarizeBy: none
+		sourceColumn: lectura
+		sortByColumn: dia_lectura
+
+	partition lecturas = m
+		mode: import
+		source =
+				let
+				    Ruta = OrigenDatos & "lecturas.csv",
+				    Contenido = if Text.StartsWith(Ruta, "http") then Web.Contents(Ruta) else File.Contents(Ruta),
+				    Origen = Csv.Document(Contenido, [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Encabezados = Table.PromoteHeaders(Origen, [PromoteAllScalars = true]),
+				    Tipos = Table.TransformColumnTypes(Encabezados, {{"dia_lectura", Int64.Type}, {"lectura", type text}}, "en-US")
+				in
+				    Tipos
+
+	annotation PBI_ResultType = Table

@@ -1,0 +1,19 @@
+relationship 5e7c2d30-e994-5972-996b-c6359c622706
+	fromColumn: paquetes.fecha_lanzamiento
+	toColumn: calendario.fecha
+
+relationship 33074405-7ad8-5de3-84f7-815217a569e1
+	fromColumn: curva_diaria.paquete
+	toColumn: paquetes.paquete
+
+relationship 617a8510-aa88-5797-84bd-77f08aaf0f79
+	fromColumn: predicciones.paquete
+	toColumn: paquetes.paquete
+
+relationship 2088c7b5-b2ae-532c-abeb-58937f8d38e3
+	fromColumn: predicciones.dia_lectura
+	toColumn: lecturas.dia_lectura
+
+relationship ff92e596-619f-555f-9980-9327d81e12b6
+	fromColumn: metricas.dia_lectura
+	toColumn: lecturas.dia_lectura

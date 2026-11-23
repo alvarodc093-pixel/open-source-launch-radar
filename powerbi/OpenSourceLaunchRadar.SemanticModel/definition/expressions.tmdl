@@ -1,0 +1,4 @@
+expression OrigenDatos = "https://raw.githubusercontent.com/alvarodc093-pixel/open-source-launch-radar/main/powerbi/datos/" meta [IsParameterQuery = true, Type = "Text", IsParameterQueryRequired = true]
+	lineageTag: 3661408c-118f-553f-92c3-72b66af91c26
+
+	annotation PBI_ResultType = Text

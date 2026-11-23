@@ -1,0 +1,141 @@
+table paquetes
+	lineageTag: 4e9891a1-a5ed-5573-9551-7dae9afc3427
+
+	/// Paquetes nuevos de PyPI con un repositorio de 10 estrellas o más.
+	measure 'Candidatos' = COUNTROWS(paquetes)
+		formatString: #,0
+		lineageTag: c85200a5-a006-538d-b660-c5a34fa7f854
+
+	/// Paquetes que entran en el modelo tras la limpieza.
+	measure 'Lanzamientos aptos' = CALCULATE(COUNTROWS(paquetes), paquetes[estado] = "apto")
+		formatString: #,0
+		lineageTag: 70e29bf5-0941-585f-bcdc-eaccbba0101c
+
+	/// Parte de los candidatos que se excluye en el preprocesamiento.
+	measure '% excluidos' = DIVIDE([Candidatos] - [Lanzamientos aptos], [Candidatos])
+		formatString: 0.0 %
+		lineageTag: 1e02fea5-53a3-547a-ab85-38fa960cc5c0
+
+	/// Descargas de pip, uv, poetry… en el primer mes del paquete mediano.
+	measure 'Mediana descargas de usuario 30 días' = CALCULATE(MEDIAN(paquetes[usuario_30d]), paquetes[estado] = "apto")
+		formatString: #,0
+		lineageTag: 3688df50-525f-58de-8ed4-39d663675181
+
+	/// Descargas con mirrors y bots en el primer mes del paquete mediano.
+	measure 'Mediana descargas totales 30 días' = CALCULATE(MEDIAN(paquetes[total_30d]), paquetes[estado] = "apto")
+		formatString: #,0
+		lineageTag: 5b10ad54-194c-56d8-b227-76118b0b6363
+
+	/// Parte de las descargas del primer mes que viene de usuarios.
+	measure '% de usuario (mediana)' = CALCULATE(MEDIAN(paquetes[pct_usuario_30d]), paquetes[estado] = "apto")
+		formatString: 0.0 %
+		lineageTag: d2f8d361-d769-5acb-8886-34f8ea4f1f5b
+
+	/// Estrellas de hoy del repositorio del paquete mediano.
+	measure 'Mediana estrellas' = CALCULATE(MEDIAN(paquetes[estrellas]), paquetes[estado] = "apto")
+		formatString: #,0
+		lineageTag: 4bc8283b-5048-50ee-84eb-8eeb42d05ab7
+
+	column paquete
+		dataType: string
+		lineageTag: aa0ae4b5-27b9-5909-91a7-d58b6c97b974
+		summarizeBy: none
+		sourceColumn: paquete
+
+	column nombre
+		dataType: string
+		lineageTag: 323fff1c-b783-5554-88c8-30c8632939de
+		summarizeBy: none
+		sourceColumn: nombre
+
+	column repo
+		dataType: string
+		lineageTag: 4c973f75-f616-5362-85c6-8c52cda90281
+		summarizeBy: none
+		sourceColumn: repo
+
+	column fecha_lanzamiento
+		dataType: dateTime
+		formatString: dd/mm/yyyy
+		lineageTag: 8e29ca19-1c1a-5a7b-a1cb-ef917b931b3a
+		summarizeBy: none
+		sourceColumn: fecha_lanzamiento
+
+	column categoria
+		dataType: string
+		lineageTag: aeb6fb65-16a4-5918-bbea-e83f290eef20
+		summarizeBy: none
+		sourceColumn: categoria
+
+	column propietario_tipo
+		dataType: string
+		lineageTag: 93b66e79-cbc6-53be-b45a-05c9085b8681
+		summarizeBy: none
+		sourceColumn: propietario_tipo
+
+	column estrellas
+		dataType: int64
+		formatString: #,0
+		lineageTag: b4f9acd2-2bfd-54d6-8563-44f774215206
+		summarizeBy: none
+		sourceColumn: estrellas
+
+	column estado
+		dataType: string
+		lineageTag: 8b4f0875-9690-5a3e-b5a1-3027b335eff4
+		summarizeBy: none
+		sourceColumn: estado
+
+	column estado_descripcion
+		dataType: string
+		lineageTag: b5c56ac0-137e-5727-a1c0-1b129b4f2196
+		summarizeBy: none
+		sourceColumn: estado_descripcion
+
+	column usuario_30d
+		dataType: int64
+		formatString: #,0
+		lineageTag: 5a412996-5746-53f9-b697-3b4bed6bbf5a
+		summarizeBy: none
+		sourceColumn: usuario_30d
+
+	column total_30d
+		dataType: int64
+		formatString: #,0
+		lineageTag: 0c90a50a-0e28-57bf-89a0-ddc2ba752bbb
+		summarizeBy: none
+		sourceColumn: total_30d
+
+	column pct_usuario_30d
+		dataType: double
+		formatString: 0.0 %
+		lineageTag: 0bc128ff-6d64-5c6a-981f-0bd1573aa726
+		summarizeBy: none
+		sourceColumn: pct_usuario_30d
+
+	column subidas_30d
+		dataType: int64
+		formatString: 0
+		lineageTag: ae16b69a-6216-5136-a4c1-a747501a31be
+		summarizeBy: none
+		sourceColumn: subidas_30d
+
+	column conjunto
+		dataType: string
+		lineageTag: eb3ce750-59a4-5a24-a214-2c0e06ee6e07
+		summarizeBy: none
+		sourceColumn: conjunto
+
+	partition paquetes = m
+		mode: import
+		source =
+				let
+				    Ruta = OrigenDatos & "paquetes.csv",
+				    Contenido = if Text.StartsWith(Ruta, "http") then Web.Contents(Ruta) else File.Contents(Ruta),
+				    Origen = Csv.Document(Contenido, [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Encabezados = Table.PromoteHeaders(Origen, [PromoteAllScalars = true]),
+				    Tipos = Table.TransformColumnTypes(Encabezados, {{"paquete", type text}, {"nombre", type text}, {"repo", type text}, {"fecha_lanzamiento", type date}, {"categoria", type text}, {"propietario_tipo", type text}, {"estrellas", Int64.Type}, {"estado", type text}, {"estado_descripcion", type text}, {"usuario_30d", Int64.Type}, {"total_30d", Int64.Type}, {"pct_usuario_30d", type number}, {"subidas_30d", Int64.Type}, {"conjunto", type text}}, "en-US")
+				in
+				    Tipos
+
+	annotation PBI_ResultType = Table

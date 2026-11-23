@@ -1,0 +1,16 @@
+model Model
+	culture: es-ES
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: es-ES
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 0
+
+ref table paquetes
+ref table calendario
+ref table lecturas
+ref table curva_diaria
+ref table predicciones
+ref table metricas

@@ -1,0 +1,110 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.4.0/schema.json",
+  "name": "ruido_curva",
+  "position": {
+    "x": 16,
+    "y": 232,
+    "z": 6,
+    "width": 1248,
+    "height": 472,
+    "tabOrder": 6
+  },
+  "visual": {
+    "visualType": "lineChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "curva_diaria"
+                    }
+                  },
+                  "Property": "dia"
+                }
+              },
+              "queryRef": "curva_diaria.dia",
+              "nativeQueryRef": "dia"
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "curva_diaria"
+                    }
+                  },
+                  "Property": "% del mes recibido"
+                }
+              },
+              "queryRef": "curva_diaria.% del mes recibido",
+              "nativeQueryRef": "% del mes recibido"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "curva_diaria"
+                    }
+                  },
+                  "Property": "% del mes recibido (totales)"
+                }
+              },
+              "queryRef": "curva_diaria.% del mes recibido (totales)",
+              "nativeQueryRef": "% del mes recibido (totales)"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "curva_diaria"
+                  }
+                },
+                "Property": "dia"
+              }
+            },
+            "direction": "Ascending"
+          }
+        ],
+        "isDefaultSort": false
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Parte del primer mes que ya ha llegado, día a día: de usuario frente a totales (paquete mediano)'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

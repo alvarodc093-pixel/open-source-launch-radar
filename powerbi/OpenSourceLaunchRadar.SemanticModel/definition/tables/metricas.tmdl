@@ -1,0 +1,72 @@
+table metricas
+	lineageTag: 4ac65a70-9799-5829-b78c-c96e68854af7
+
+	/// Factor de error típico de cada candidato en test.
+	measure 'Factor de error en test' = ```
+			VAR d = SELECTEDVALUE(lecturas[dia_lectura], 7)
+			RETURN CALCULATE(AVERAGE(metricas[factor_error]), lecturas[dia_lectura] = d)
+			```
+		formatString: 0.00
+		lineageTag: 41cd52f1-3e46-5cf0-b7f8-b844cb7d7b13
+
+	column dia_lectura
+		dataType: int64
+		formatString: 0
+		isHidden
+		lineageTag: cbeef957-9586-51d0-a9dc-cda46ba64c8e
+		summarizeBy: none
+		sourceColumn: dia_lectura
+
+	column modelo
+		dataType: string
+		lineageTag: 917002dd-59ee-530b-936a-e407e3144ff5
+		summarizeBy: none
+		sourceColumn: modelo
+
+	column elegido
+		dataType: string
+		lineageTag: 39b2ec38-255b-58f0-a30f-a5d658e5dfc9
+		summarizeBy: none
+		sourceColumn: elegido
+
+	column mae_log
+		dataType: double
+		formatString: 0.000
+		lineageTag: 074253ee-5de0-509e-99a0-ad1d86c849ed
+		summarizeBy: none
+		sourceColumn: mae_log
+
+	column factor_error
+		dataType: double
+		formatString: 0.00
+		lineageTag: 7e43c852-18de-5e1d-a61f-1afb86e41589
+		summarizeBy: none
+		sourceColumn: factor_error
+
+	column dentro_x2
+		dataType: double
+		formatString: 0 %
+		lineageTag: 0c23527b-120b-57f2-93dc-0b9261a22caf
+		summarizeBy: none
+		sourceColumn: dentro_x2
+
+	column cv_mae_log
+		dataType: double
+		formatString: 0.000
+		lineageTag: e390887f-f48e-5232-a25f-4c4c71b4d540
+		summarizeBy: none
+		sourceColumn: cv_mae_log
+
+	partition metricas = m
+		mode: import
+		source =
+				let
+				    Ruta = OrigenDatos & "metricas.csv",
+				    Contenido = if Text.StartsWith(Ruta, "http") then Web.Contents(Ruta) else File.Contents(Ruta),
+				    Origen = Csv.Document(Contenido, [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Encabezados = Table.PromoteHeaders(Origen, [PromoteAllScalars = true]),
+				    Tipos = Table.TransformColumnTypes(Encabezados, {{"dia_lectura", Int64.Type}, {"modelo", type text}, {"elegido", type text}, {"mae_log", type number}, {"factor_error", type number}, {"dentro_x2", type number}, {"cv_mae_log", type number}}, "en-US")
+				in
+				    Tipos
+
+	annotation PBI_ResultType = Table
