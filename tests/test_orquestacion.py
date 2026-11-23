@@ -76,9 +76,12 @@ def test_paso_github_guarda_y_no_repite(
     guardado = json.loads((raw / "github.json").read_text(encoding="utf-8"))
     assert set(guardado) == {"dueno/a", "dueno/b"}
 
+    # El lote roto se reintenta una vez al final de la misma ejecución.
+    assert lotes[-1] == ["dueno/roto"] and lotes.count(["dueno/roto"]) == 2
+
     lotes.clear()
     ingesta.paso_github(lanzamientos)
-    assert lotes == [["dueno/roto"]]  # solo vuelve a pedir lo que faltaba
+    assert lotes == [["dueno/roto"]] * 2  # solo vuelve a pedir lo que faltaba
 
 
 def test_paso_github_sin_token(raw: Path, monkeypatch: pytest.MonkeyPatch) -> None:

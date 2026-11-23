@@ -114,7 +114,11 @@ def descargar_repos(
 ) -> dict[str, dict[str, Any] | None]:
     """{repo pedido: datos o None si no existe}, para un lote de hasta 100."""
     resp = cliente.post(URL, json={"query": construir_consulta(repos)})
-    cuerpo = resp.json()
+    try:
+        cuerpo = resp.json()
+    except ValueError as exc:
+        # GitHub a veces responde 200 con el cuerpo vacío cuando va cargado.
+        raise ErrorFuente("GraphQL devolvió una respuesta que no es JSON") from exc
     errores = [e for e in cuerpo.get("errors") or [] if e.get("type") != "NOT_FOUND"]
     if errores:
         raise ErrorFuente(f"GraphQL: {errores[0].get('message', errores[0])}")

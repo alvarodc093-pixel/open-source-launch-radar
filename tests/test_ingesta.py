@@ -199,6 +199,13 @@ def test_descargar_repos_falla_con_otros_errores() -> None:
         github.descargar_repos(_cliente(), ["a/b"])
 
 
+@responses.activate
+def test_descargar_repos_con_cuerpo_vacio() -> None:
+    responses.post(github.URL, body="")
+    with pytest.raises(ErrorFuente, match="no es JSON"):
+        github.descargar_repos(_cliente(), ["a/b"])
+
+
 # --- Cliente HTTP ------------------------------------------------------------
 
 

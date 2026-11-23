@@ -99,16 +99,27 @@ def paso_github(lanzamientos: list[dict[str, Any]]) -> dict[str, Any]:
     enlazados = {github.extraer_repo(p["urls"]) for p in lanzamientos} - {None}
     pendientes = sorted(r for r in enlazados if r not in repos_guardados)
     logger.info("GitHub: %d pendientes de %d", len(pendientes), len(enlazados))
+    # Los lotes fallidos se reintentan una vez al final, cuando la API ya se
+    # ha recuperado del fallo pasajero.
+    fallidos: list[list[str]] = []
     for i in range(0, len(pendientes), github.POR_CONSULTA):
         lote = pendientes[i : i + github.POR_CONSULTA]
         try:
             repos_guardados.update(github.descargar_repos(cliente, lote))
         except ErrorFuente as exc:
             logger.warning("Lote de GitHub sin descargar: %s", exc)
+            fallidos.append(lote)
             continue
         _guardar(RUTA_GITHUB, repos_guardados)
         if (i // github.POR_CONSULTA) % 20 == 0:
             logger.info("GitHub: %d/%d", i + len(lote), len(pendientes))
+    for lote in fallidos:
+        try:
+            repos_guardados.update(github.descargar_repos(cliente, lote))
+        except ErrorFuente as exc:
+            logger.warning("Lote de GitHub perdido (se pedirá otro día): %s", exc)
+            continue
+        _guardar(RUTA_GITHUB, repos_guardados)
     return repos_guardados
 
 
