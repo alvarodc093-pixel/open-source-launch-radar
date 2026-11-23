@@ -212,6 +212,14 @@ def test_republicadores_exigen_muchos_duenos() -> None:
         for i in range(10)
     ]
     filas += [{"paquete": f"nlr-p{i}", "repo": f"natlab/p{i}"} for i in range(10)]
+    # Un ecosistema de plugins: 10 integraciones con el patrón, pero la mayoría
+    # de sus paquetes vienen de un repositorio con el mismo nombre.
+    filas += [
+        {"paquete": f"plugin-x{i}", "repo": f"empresa{i}/x{i}"} for i in range(10)
+    ]
+    filas += [
+        {"paquete": f"plugin-y{i}", "repo": f"autor{i}/plugin-y{i}"} for i in range(30)
+    ]
     assert prep.republicadores(pd.DataFrame(filas)) == {"copia"}
 
 

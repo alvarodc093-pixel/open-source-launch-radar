@@ -40,11 +40,16 @@ PCT_PREVIAS_MAX = 0.05
 # Un repositorio con más de un año antes de su primera subida a PyPI es un
 # proyecto que ya tenía usuarios (o un paquete renombrado), no un lanzamiento.
 DIAS_REPO_PREVIOS_MAX = 365
-# Un prefijo que se pone delante del nombre de repositorios de al menos 10
-# dueños distintos es de alguien que republica proyectos ajenos en PyPI (en
-# 2026, «iflow-mcp-…» y «mseep-…» con cientos de servidores MCP). Esos paquetes
-# enlazan el repositorio original y se quedarían con sus estrellas.
+# Hay quien republica en PyPI proyectos ajenos con un prefijo propio delante
+# del nombre del repositorio original (en 2026, «iflow-mcp-…» y «mseep-…», con
+# cientos de servidores MCP). Esos paquetes enlazan el repositorio original y
+# se quedarían con sus estrellas. Un prefijo cuenta como republicador si lo
+# usan paquetes de repositorios de al menos 10 dueños distintos y si al menos
+# la mitad de sus paquetes siguen ese patrón: en los ecosistemas de plugins
+# («langchain-…», «django-…», «pytest-…») la mayoría de los paquetes vienen de
+# un repositorio con el mismo nombre y el patrón no pasa del 20 %.
 REPUBLICADOS_MIN_DUENOS = 10
+REPUBLICADOS_FRACCION_MIN = 0.5
 
 # Categorías, en orden de prioridad: un paquete de agentes que también es una
 # herramienta de línea de comandos cuenta como «Agentes y LLM». Cada una se
@@ -235,7 +240,7 @@ def prefijo_ajeno(paquete: str, repo: str) -> str | None:
 
 
 def republicadores(paquetes: pd.DataFrame) -> set[str]:
-    """Prefijos que se usan con repositorios de muchos dueños distintos."""
+    """Prefijos que casi siempre van delante del repositorio de otro."""
     con_repo = paquetes.dropna(subset=["repo"])
     prefijos = pd.Series(
         [
@@ -245,7 +250,12 @@ def republicadores(paquetes: pd.DataFrame) -> set[str]:
         index=con_repo.index,
     )
     duenos = con_repo["repo"].str.split("/").str[0].groupby(prefijos).nunique()
-    return set(duenos[duenos >= REPUBLICADOS_MIN_DUENOS].index)
+    salida = set()
+    for prefijo in duenos[duenos >= REPUBLICADOS_MIN_DUENOS].index:
+        con_prefijo = paquetes["paquete"].str.startswith(f"{prefijo}-").sum()
+        if (prefijos == prefijo).sum() >= REPUBLICADOS_FRACCION_MIN * con_prefijo:
+            salida.add(prefijo)
+    return salida
 
 
 def es_republicado(paquete: str, repo: Any, ajenos: set[str]) -> bool:
