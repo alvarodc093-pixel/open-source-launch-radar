@@ -112,3 +112,23 @@ def test_faltan_procesados(tmp_path: Path) -> None:
 def test_main_sin_datos(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     monkeypatch.setattr(config, "DIR_PROCESADO", tmp_path)
     assert exportar.main() == 1
+
+
+def test_informe_resume_lo_exportado(salida: Path) -> None:
+    from radar import informe
+
+    texto = informe.resumen(salida)
+    assert "400 lanzamientos aptos de 403 candidatos" in texto
+    assert "| Día 7 |" in texto and "| Día 21 |" in texto
+    assert "Antes de lanzar" in texto
+    assert "Estrellas frente a descargas" in texto
+
+
+def test_informe_sin_datos(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture
+) -> None:
+    from radar import informe
+
+    monkeypatch.setattr(config, "DIR_APP_DATOS", tmp_path)
+    assert informe.main() == 1
+    assert "radar.exportar" in capsys.readouterr().err
