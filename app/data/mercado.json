@@ -1,5 +1,5 @@
 {
- "generado_en": "2026-11-23T15:16:53+00:00",
+ "generado_en": "2026-11-25T15:30:18+00:00",
  "embudo": {
   "con_enlace_a_github": 79193,
   "tras_sin_repo": 61817,
@@ -11,14 +11,15 @@
   "tras_versiones_previas_borradas": 9666,
   "tras_proyecto_anterior": 5217
  },
- "paquetes_candidatos": 10610,
+ "paquetes_candidatos": 79193,
  "paquetes_aptos": 5217,
  "exclusiones": {
-  "apto": 5217,
-  "proyecto_anterior": 4449,
-  "versiones_previas_borradas": 481,
+  "sin_repo": 17376,
+  "pocas_estrellas": 51207,
   "republicado": 385,
-  "repo_fork": 78
+  "repo_fork": 78,
+  "versiones_previas_borradas": 481,
+  "proyecto_anterior": 4449
  },
  "rango_lanzamientos": {
   "desde": "2025-11-23",

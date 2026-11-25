@@ -43,7 +43,14 @@ def test_escribe_los_tres_json(salida: Path) -> None:
 
     mercado = _leer(salida / "mercado.json")
     assert mercado["paquetes_aptos"] == 400
-    assert mercado["exclusiones"]["versiones_previas_borradas"] == 3
+    # Las exclusiones salen del embudo completo, que empieza en 5.000: los
+    # motivos de los paquetes que no llegan a paquetes.csv también cuentan.
+    assert mercado["paquetes_candidatos"] == 5000
+    assert mercado["exclusiones"] == {
+        "sin_repo": 1000,
+        "pocas_estrellas": 3597,
+        "versiones_previas_borradas": 3,
+    }
     assert mercado["embudo"]["con_enlace_a_github"] == 5000
     assert 0 < mercado["mediana_pct_usuario_30d"] < 1
     assert "spearman" in mercado["contraste_estrellas"]
@@ -118,7 +125,8 @@ def test_informe_resume_lo_exportado(salida: Path) -> None:
     from radar import informe
 
     texto = informe.resumen(salida)
-    assert "400 lanzamientos aptos de 403 candidatos" in texto
+    assert "400 lanzamientos aptos de 5000 paquetes nuevos con enlace" in texto
+    assert "Exclusiones:** sin_repo: 1000" in texto
     assert "| Día 7 |" in texto and "| Día 21 |" in texto
     assert "Antes de lanzar" in texto
     assert "Estrellas frente a descargas" in texto

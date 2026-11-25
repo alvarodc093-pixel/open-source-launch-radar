@@ -247,8 +247,23 @@ def benchmark(dataset: pd.DataFrame) -> dict[str, Any]:
     }
 
 
+def exclusiones_del_embudo(embudo: dict[str, int]) -> dict[str, int]:
+    """Motivos de exclusión con su cuenta, derivados de los pasos del embudo.
+
+    El embudo recorre la muestra completa, incluidos los paquetes sin
+    repositorio o con pocas estrellas, que no llegan a `paquetes.csv`. Por eso
+    los motivos se leen de ahí y no del CSV: sumados con los aptos dan el total
+    de la muestra. Los motivos sin casos no se listan.
+    """
+    pasos = list(embudo.items())
+    return {
+        nombre.removeprefix("tras_"): anterior - actual
+        for (_, anterior), (nombre, actual) in zip(pasos, pasos[1:], strict=False)
+        if nombre.startswith("tras_") and (anterior - actual) > 0
+    }
+
+
 def resumen_mercado(
-    paquetes: pd.DataFrame,
     dataset: pd.DataFrame,
     diarias: pd.DataFrame,
     embudo: dict[str, int],
@@ -271,9 +286,9 @@ def resumen_mercado(
     total_30 = dataset["total_30d"].replace(0, np.nan)
     return {
         "embudo": embudo,
-        "paquetes_candidatos": len(paquetes),
+        "paquetes_candidatos": embudo["con_enlace_a_github"],
         "paquetes_aptos": len(dataset),
-        "exclusiones": paquetes["estado"].value_counts().to_dict(),
+        "exclusiones": exclusiones_del_embudo(embudo),
         "rango_lanzamientos": {
             "desde": dataset["fecha_lanzamiento"].min().date().isoformat(),
             "hasta": dataset["fecha_lanzamiento"].max().date().isoformat(),
@@ -451,7 +466,7 @@ def cargar_procesados(
 
 def exportar(carpeta_procesados: Path, carpeta_salida: Path, ruta_casos: Path) -> int:
     """Entrena, escribe los tres JSON de la app y los casos dorados; devuelve cuántos."""
-    dataset, paquetes, diarias, embudo = cargar_procesados(carpeta_procesados)
+    dataset, _, diarias, embudo = cargar_procesados(carpeta_procesados)
     train, _, test = m.particion_temporal(dataset)
 
     radar = {
@@ -488,7 +503,7 @@ def exportar(carpeta_procesados: Path, carpeta_salida: Path, ruta_casos: Path) -
         carpeta_salida / "mercado.json",
         {
             "generado_en": generado,
-            **resumen_mercado(paquetes, dataset, diarias, embudo),
+            **resumen_mercado(dataset, diarias, embudo),
         },
     )
     casos = casos_dorados(radar, previo, test)

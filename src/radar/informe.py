@@ -49,9 +49,9 @@ def resumen(carpeta: Path) -> str:
         f"Datos generados el {radar['generado_en']}.",
         "",
         f"- **Muestra:** {mercado['paquetes_aptos']} lanzamientos aptos de "
-        f"{mercado['paquetes_candidatos']} candidatos, del {rango['desde']} "
-        f"al {rango['hasta']}.",
-        f"- **Estados:** {exclusiones}.",
+        f"{mercado['paquetes_candidatos']} paquetes nuevos con enlace a GitHub, "
+        f"del {rango['desde']} al {rango['hasta']}.",
+        f"- **Exclusiones:** {exclusiones}.",
         "- **Mediana de descargas de usuario a 30 días:** "
         f"{mercado['mediana_usuario_30d']:.0f} (de "
         f"{mercado['mediana_total_30d']:.0f} totales; "

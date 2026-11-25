@@ -79,7 +79,21 @@ def procesados(tmp_path: Path) -> Path:
     excluido = paquetes.iloc[:3].assign(estado="versiones_previas_borradas")
     pd.concat([paquetes, excluido]).to_csv(carpeta / "paquetes.csv", index=False)
     diarias.to_csv(carpeta / "descargas_diarias.csv", index=False)
+    # Embudo completo de la muestra: 5.000 con enlace a GitHub y 400 aptos,
+    # con los mismos pasos en el mismo orden que radar.preparacion.embudo.
     (carpeta / "embudo.json").write_text(
-        json.dumps({"con_enlace_a_github": 5000, "tras_proyecto_anterior": 400})
+        json.dumps(
+            {
+                "con_enlace_a_github": 5000,
+                "tras_sin_repo": 4000,
+                "tras_pocas_estrellas": 403,
+                "tras_republicado": 403,
+                "tras_repo_fork": 403,
+                "tras_sin_descargas": 403,
+                "tras_mes_incompleto": 403,
+                "tras_versiones_previas_borradas": 400,
+                "tras_proyecto_anterior": 400,
+            }
+        )
     )
     return carpeta
