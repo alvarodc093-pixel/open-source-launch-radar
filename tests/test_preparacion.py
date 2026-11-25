@@ -11,6 +11,8 @@ import pytest
 
 from radar import preparacion as prep
 
+HOY = date(2026, 6, 1)  # ventana: 2025-06-01 a 2026-04-17
+
 
 def _lanzamiento(paquete: str = "paq", **datos):  # noqa: ANN003, ANN202
     base = {
@@ -183,12 +185,38 @@ def test_main_escribe_las_tablas(
     procesado = tmp_path / "processed"
     monkeypatch.setattr(prep.config, "DIR_RAW", raw)
     monkeypatch.setattr(prep.config, "DIR_PROCESADO", procesado)
-    assert prep.main() == 0
+    assert prep.main(hoy=HOY) == 0
     assert (procesado / "dataset_radar.csv").exists()
     embudo = json.loads((procesado / "embudo.json").read_text(encoding="utf-8"))
     assert embudo["con_enlace_a_github"] == 2
     # paquetes.csv solo guarda los candidatos, no los que no tienen repositorio.
     assert "otro" not in (procesado / "paquetes.csv").read_text(encoding="utf-8")
+
+
+def test_cargar_raw_aplica_la_ventana(tmp_path: Path) -> None:
+    """La caché guarda meses que ya salieron de la ventana: no se deben leer."""
+    (tmp_path / "lanzamientos").mkdir()
+    (tmp_path / "descargas").mkdir()
+
+    def _mes(nombre: str, subidas: list[str]) -> None:
+        (tmp_path / "lanzamientos" / f"{nombre}.json").write_text(
+            json.dumps(
+                {
+                    "desde": subidas[0][:10],
+                    "hasta": subidas[-1][:10],
+                    "paquetes": [
+                        _lanzamiento(nombre, primera_subida=s) for s in subidas
+                    ],
+                }
+            ),
+            encoding="utf-8",
+        )
+
+    _mes("2024-01", ["2024-01-10"])  # antes del inicio
+    _mes("2026-03", ["2026-03-02"])  # dentro
+    _mes("2026-05", ["2026-05-01"])  # después del cierre
+    lanzamientos, _, _ = prep.cargar_raw(tmp_path, hoy=HOY)
+    assert [p["paquete"] for p in lanzamientos] == ["2026-03"]
 
 
 @pytest.mark.parametrize(

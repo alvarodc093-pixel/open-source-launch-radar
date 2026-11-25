@@ -150,22 +150,50 @@ def test_main_por_pasos(raw: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(
         ingesta, "paso_descargas", lambda _l, _r, _h: llamados.append("descargas")
     )
-    assert ingesta.main([]) == 0
+    assert ingesta.main([], hoy=HOY) == 0
     assert llamados == ["lanzamientos", "github", "descargas"]
 
-    # Un paso suelto lee lo que dejaron los anteriores.
+    # Un paso suelto lee lo que dejaron los anteriores (aún no hay ninguno).
     llamados.clear()
-    assert ingesta.main(["--paso", "descargas"]) == 1  # aún no hay lanzamientos
+    assert ingesta.main(["--paso", "descargas"], hoy=HOY) == 1
     (raw / "lanzamientos").mkdir()
     (raw / "lanzamientos" / "2026-03.json").write_text(
         json.dumps({"paquetes": [_paquete("a")]}), encoding="utf-8"
     )
-    assert ingesta.main(["--paso", "descargas"]) == 0
+    assert ingesta.main(["--paso", "descargas"], hoy=HOY) == 0
     assert llamados == ["descargas"]
+
+
+def test_paso_parcial_ignora_lo_que_salio_de_la_ventana(
+    raw: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """La caché conserva meses viejos y futuros: el parcial no los debe usar."""
+    (raw / "lanzamientos").mkdir()
+    for nombre, subida in [
+        ("2025-04", "2025-04-10 00:00:00"),  # antes del inicio
+        ("2026-03", "2026-03-02 10:00:00"),  # dentro
+        ("2026-05", "2026-05-10 00:00:00"),  # después del cierre
+    ]:
+        (raw / "lanzamientos" / f"{nombre}.json").write_text(
+            json.dumps({"paquetes": [_paquete(nombre, subida)]}), encoding="utf-8"
+        )
+    leidos: list[str] = []
+    monkeypatch.setattr(
+        ingesta,
+        "paso_github",
+        lambda lanz: leidos.extend(p["paquete"] for p in lanz) or {},
+    )
+    monkeypatch.setattr(ingesta, "paso_descargas", lambda _l, _r, _h: None)
+    assert ingesta.main(["--paso", "github"], hoy=HOY) == 0
+    assert leidos == ["2026-03"]
 
 
 def test_ventana_y_token(monkeypatch: pytest.MonkeyPatch) -> None:
     assert config.ventana_lanzamientos(HOY) == (date(2025, 5, 20), date(2026, 4, 5))
+    assert config.en_ventana("2026-03-02 10:00:00", HOY)
+    assert config.en_ventana("2026-04-05", HOY)  # el último día cuenta
+    assert not config.en_ventana("2026-04-06", HOY)
+    assert not config.en_ventana("2025-05-19", HOY)
     monkeypatch.setenv("GITHUB_TOKEN", " abc ")
     assert config.token_github() == "abc"
     monkeypatch.setenv("GITHUB_TOKEN", "")

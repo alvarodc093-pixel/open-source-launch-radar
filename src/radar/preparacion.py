@@ -21,7 +21,7 @@ from __future__ import annotations
 import json
 import logging
 import re
-from datetime import date
+from datetime import UTC, date, datetime
 from pathlib import Path
 from typing import Any
 
@@ -114,12 +114,16 @@ def _leer(ruta: Path) -> Any:
 
 def cargar_raw(
     dir_raw: Path | None = None,
+    hoy: date | None = None,
 ) -> tuple[list[dict[str, Any]], dict[str, Any], dict[str, dict[str, Any]]]:
     dir_raw = dir_raw or config.DIR_RAW
+    hoy = hoy or datetime.now(UTC).date()
+    # La caché guarda meses completos que van saliendo de la ventana.
     lanzamientos = [
         p
         for ruta in sorted((dir_raw / "lanzamientos").glob("*.json"))
         for p in _leer(ruta)["paquetes"]
+        if config.en_ventana(p["primera_subida"], hoy)
     ]
     ruta_github = dir_raw / "github.json"
     repos = _leer(ruta_github) if ruta_github.exists() else {}
@@ -384,9 +388,9 @@ def embudo(paquetes: pd.DataFrame) -> dict[str, int]:
     return pasos
 
 
-def main() -> int:
+def main(hoy: date | None = None) -> int:
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
-    lanzamientos, repos, series = cargar_raw()
+    lanzamientos, repos, series = cargar_raw(hoy=hoy)
     if not lanzamientos:
         logger.error("No hay datos en %s: ejecuta antes la ingesta.", config.DIR_RAW)
         return 1

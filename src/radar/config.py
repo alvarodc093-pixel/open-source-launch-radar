@@ -50,6 +50,18 @@ def ventana_lanzamientos(hoy: date) -> tuple[date, date]:
     return hoy - timedelta(days=HISTORICO_DIAS), hoy - timedelta(days=DIAS_MARGEN)
 
 
+def en_ventana(primera_subida: str, hoy: date) -> bool:
+    """¿Está el lanzamiento dentro de la ventana de la muestra?
+
+    La caché de la ingesta guarda meses completos que van saliendo de la
+    ventana al moverse. Leerla sin este filtro hace que un `--paso` o la
+    preparación entren con lanzamientos que `paso_lanzamientos` ya dejó de
+    pedir, y el run completo y el parcial acaben con muestras distintas.
+    """
+    desde, hasta = ventana_lanzamientos(hoy)
+    return desde <= date.fromisoformat(primera_subida[:10]) <= hasta
+
+
 def token_github() -> str | None:
     """GITHUB_TOKEN del entorno o, en local, el de la sesión de `gh`."""
     token = os.getenv("GITHUB_TOKEN", "").strip()

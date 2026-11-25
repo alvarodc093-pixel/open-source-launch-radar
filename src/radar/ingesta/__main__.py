@@ -189,7 +189,7 @@ def paso_descargas(
         logger.info("Descargas: %d/%d", hechos, len(pendientes))
 
 
-def main(argv: list[str] | None = None) -> int:
+def main(argv: list[str] | None = None, hoy: date | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--paso", choices=["lanzamientos", "github", "descargas"])
     args = parser.parse_args(argv)
@@ -197,14 +197,16 @@ def main(argv: list[str] | None = None) -> int:
         level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s"
     )
 
-    hoy = datetime.now(UTC).date()
+    hoy = hoy or datetime.now(UTC).date()
     lanzamientos = (
         paso_lanzamientos(hoy)
         if args.paso in (None, "lanzamientos")
+        # La caché conserva meses que ya han salido de la ventana.
         else [
             p
             for ruta in sorted(DIR_LANZAMIENTOS.glob("*.json"))
             for p in _leer(ruta)["paquetes"]
+            if config.en_ventana(p["primera_subida"], hoy)
         ]
     )
     if not lanzamientos:
